@@ -1,0 +1,2968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XanderSuite HRMS — Employee Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ── Same design system ── */
+        :root {
+            --brand-900: #0f1f3d;
+            --brand-800: #1a3260;
+            --brand-700: #1e4080;
+            --brand-600: #2952a3;
+            --brand-500: #3b6fd4;
+            --brand-400: #5a8be8;
+            --brand-300: #93b5f5;
+            --brand-100: #dce9fd;
+            --brand-50: #f0f5ff;
+            --accent: #f97316;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-500: #6b7280;
+            --neutral-700: #374151;
+            --neutral-900: #111827;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--neutral-50);
+            color: var(--neutral-900);
+        }
+        .font-display {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* ── Sidebar ── */
+        #sidebar {
+            width: 260px;
+            min-height: 100vh;
+            background: var(--brand-900);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        .sidebar-logo {
+            padding: 24px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .sidebar-logo span.logo-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: #fff;
+            letter-spacing: -0.3px;
+        }
+        .sidebar-logo span.logo-sub {
+            font-size: 0.65rem;
+            color: var(--brand-300);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            display: block;
+            margin-top: 2px;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            user-select: none;
+        }
+        .nav-item:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .nav-item.active {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-left-color: var(--brand-400);
+        }
+        .nav-item i {
+            width: 18px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+
+        /* ── Sidebar action button (Add Employee) ── */
+        .sidebar-action {
+            margin: 12px 16px 8px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--brand-600), var(--brand-400));
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            width: calc(100% - 32px);
+            justify-content: center;
+        }
+        .sidebar-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(59, 111, 212, 0.35);
+        }
+        .sidebar-action i {
+            font-size: 0.9rem;
+        }
+
+        /* ── Topbar ── */
+        #topbar {
+            height: 64px;
+            background: #fff;
+            border-bottom: 1px solid var(--neutral-200);
+            display: flex;
+            align-items: center;
+            padding: 0 24px;
+            position: fixed;
+            top: 0;
+            left: 260px;
+            right: 0;
+            z-index: 99;
+            transition: left 0.3s;
+        }
+        .topbar-search {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--neutral-100);
+            padding: 8px 14px;
+            border-radius: 8px;
+            flex: 0 0 280px;
+            border: 1px solid var(--neutral-200);
+        }
+        .topbar-search input {
+            border: none;
+            background: transparent;
+            font-size: 0.875rem;
+            color: var(--neutral-700);
+            outline: none;
+            width: 100%;
+        }
+        .topbar-search input::placeholder {
+            color: var(--neutral-500);
+        }
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            color: var(--neutral-500);
+            position: relative;
+        }
+        .icon-btn:hover {
+            background: var(--neutral-100);
+            color: var(--neutral-700);
+        }
+        .avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--brand-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 2px solid var(--brand-100);
+        }
+        .breadcrumb {
+            font-size: 0.8rem;
+            color: var(--neutral-500);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .breadcrumb .crumb-active {
+            color: var(--neutral-900);
+            font-weight: 500;
+        }
+
+        /* ── Main ── */
+        #main {
+            margin-left: 260px;
+            margin-top: 64px;
+            padding: 28px;
+            min-height: calc(100vh - 64px);
+            transition: margin-left 0.3s;
+        }
+        .page-section {
+            display: none;
+        }
+        .page-section.active {
+            display: block;
+        }
+
+        /* ── Cards ── */
+        .stat-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--neutral-200);
+            transition: box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+        }
+        .stat-label {
+            font-size: 0.78rem;
+            color: var(--neutral-500);
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .stat-change {
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        .stat-change.up {
+            color: var(--success);
+        }
+        .stat-change.down {
+            color: var(--danger);
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--neutral-200);
+            overflow: hidden;
+        }
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--neutral-100);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .card-title {
+            font-weight: 700;
+            font-size: 0.92rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .card-body {
+            padding: 18px 20px;
+        }
+
+        /* ── Table ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th {
+            text-align: left;
+            font-size: 0.72rem;
+            color: var(--neutral-500);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--neutral-200);
+            background: var(--neutral-50);
+        }
+        .data-table td {
+            padding: 11px 14px;
+            border-bottom: 1px solid var(--neutral-100);
+            font-size: 0.85rem;
+            vertical-align: middle;
+        }
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        .data-table tr:hover td {
+            background: var(--neutral-50);
+        }
+        .data-table .clickable-row {
+            cursor: pointer;
+        }
+        .data-table .clickable-row:hover td {
+            background: var(--brand-50);
+        }
+
+        /* ── Badges ── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        .badge-green {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .badge-yellow {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .badge-red {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .badge-blue {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        .badge-gray {
+            background: #f3f4f6;
+            color: #374151;
+        }
+        .badge-purple {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+        .badge-pink {
+            background: #fce7f3;
+            color: #9d174d;
+        }
+        .badge-indigo {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            border: 1px solid transparent;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: var(--brand-600);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--brand-700);
+        }
+        .btn-secondary {
+            background: #fff;
+            color: var(--neutral-700);
+            border-color: var(--neutral-300);
+        }
+        .btn-secondary:hover {
+            background: var(--neutral-50);
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #059669;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-warning {
+            background: var(--warning);
+            color: #fff;
+        }
+        .btn-warning:hover {
+            background: #d97706;
+        }
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 0.78rem;
+        }
+        .btn-icon {
+            padding: 6px;
+            border-radius: 8px;
+        }
+
+        /* ── Forms ── */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-label {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--neutral-700);
+            margin-bottom: 5px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--neutral-300);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--neutral-900);
+            outline: none;
+            transition: border-color 0.15s;
+            background: #fff;
+        }
+        .form-control:focus {
+            border-color: var(--brand-500);
+            box-shadow: 0 0 0 3px rgba(59, 111, 212, 0.12);
+        }
+        .form-control::placeholder {
+            color: var(--neutral-300);
+        }
+        select.form-control {
+            cursor: pointer;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-hint {
+            font-size: 0.7rem;
+            color: var(--neutral-500);
+            margin-top: 3px;
+        }
+        .required-star {
+            color: var(--danger);
+            margin-right: 2px;
+        }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            max-width: 800px;
+            width: 94%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.25s;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+        .modal-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: var(--neutral-500);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .modal-close:hover {
+            background: var(--neutral-100);
+        }
+
+        /* ── Drawer (right slide-out panel) ── */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1100;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .drawer-overlay.open {
+            display: block;
+            opacity: 1;
+        }
+        .drawer-overlay.open .drawer-panel {
+            transform: translateX(0);
+        }
+        .drawer-panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 560px;
+            max-width: 92vw;
+            height: 100%;
+            background: #fff;
+            box-shadow: -8px 0 30px rgba(0, 0, 0, 0.15);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1101;
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--neutral-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--neutral-50);
+            flex-shrink: 0;
+        }
+        .drawer-header .drawer-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .drawer-close {
+            background: none;
+            border: none;
+            font-size: 1.3rem;
+            color: var(--neutral-500);
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .drawer-close:hover {
+            background: var(--neutral-200);
+        }
+        .drawer-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .drawer-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--neutral-200);
+            background: var(--neutral-50);
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            flex-shrink: 0;
+        }
+
+        /* ── Tabs ── */
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--neutral-200);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-item {
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--neutral-500);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+            white-space: nowrap;
+        }
+        .tab-item:hover {
+            color: var(--neutral-700);
+        }
+        .tab-item.active {
+            color: var(--brand-600);
+            border-bottom-color: var(--brand-600);
+            font-weight: 600;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ── Employee Card ── */
+        .emp-card {
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--neutral-200);
+            padding: 20px;
+            text-align: center;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .emp-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            border-color: var(--brand-300);
+        }
+        .emp-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            background: var(--brand-500);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.2rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* ── Profile ── */
+        .profile-header {
+            background: linear-gradient(135deg, var(--brand-900), var(--brand-700));
+            border-radius: 12px;
+            padding: 32px;
+            color: #fff;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .profile-avatar-lg {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--brand-400);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #fff;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            flex-shrink: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        /* ── Toast ── */
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            background: #1f2937;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            min-width: 260px;
+            animation: slideInRight 0.3s, fadeOut 0.3s 2.7s;
+            border-left: 4px solid var(--success);
+        }
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+        .toast.info {
+            border-left-color: var(--brand-400);
+        }
+
+        /* ── Animations ── */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(60px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* ── Onboarding Candidate ── */
+        .candidate-card {
+            background: var(--neutral-50);
+            border: 1px solid var(--neutral-200);
+            border-radius: 10px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            transition: border-color 0.15s;
+        }
+        .candidate-card:hover {
+            border-color: var(--brand-300);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-260px);
+            }
+            #sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            #topbar {
+                left: 0;
+            }
+            #main {
+                margin-left: 0;
+            }
+            #mobileMenuBtn {
+                display: flex !important;
+            }
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.3);
+                z-index: 50;
+            }
+            .sidebar-overlay.open {
+                display: block;
+            }
+            .topbar-search {
+                display: none;
+            }
+            .kpi-grid {
+                grid-template-columns: 1fr 1fr !important;
+            }
+            .sidebar-action {
+                width: calc(100% - 32px);
+                margin: 12px 16px 8px;
+                font-size: 0.78rem;
+                padding: 8px 14px;
+            }
+            .drawer-panel {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+        #mobileMenuBtn {
+            display: none;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 22px;
+        }
+
+        /* ── Import options ── */
+        .import-option {
+            border: 2px solid var(--neutral-200);
+            border-radius: 12px;
+            padding: 18px 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            text-align: center;
+        }
+        .import-option:hover {
+            border-color: var(--brand-400);
+            background: var(--brand-50);
+        }
+        .import-option.selected {
+            border-color: var(--brand-600);
+            background: var(--brand-50);
+        }
+        .import-option i {
+            font-size: 1.6rem;
+            color: var(--brand-500);
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* ── User dropdown ── */
+        .user-dropdown {
+            position: absolute;
+            top: 52px;
+            right: 0;
+            width: 200px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid var(--neutral-200);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+            z-index: 200;
+            display: none;
+            overflow: hidden;
+        }
+        .user-dropdown.open {
+            display: block;
+        }
+        .user-dropdown-item {
+            padding: 11px 16px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.1s;
+        }
+        .user-dropdown-item:hover {
+            background: var(--neutral-50);
+        }
+        .user-dropdown-item.danger {
+            color: var(--danger);
+        }
+        .user-dropdown-item.danger:hover {
+            background: #fef2f2;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.active {
+            background: var(--success);
+        }
+        .status-dot.inactive {
+            background: var(--danger);
+        }
+        .status-dot.pending {
+            background: var(--warning);
+        }
+
+        .onboarding-badge {
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* config item */
+        .config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--neutral-100);
+        }
+        .config-item:last-child {
+            border-bottom: none;
+        }
+        .config-item .name {
+            font-weight: 500;
+        }
+        .config-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .config-section-title {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--neutral-700);
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ─── TOAST CONTAINER ─── -->
+    <div id="toastContainer"></div>
+
+    <!-- ─── LOGIN PAGE ─── -->
+    <div id="loginPage" style="min-height:100vh;background:linear-gradient(135deg,var(--brand-900) 0%,var(--brand-700) 50%,var(--brand-500) 100%);display:flex;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:#fff;border-radius:20px;padding:40px;width:100%;max-width:420px;box-shadow:0 30px 80px rgba(0,0,0,0.25);">
+            <div style="text-align:center;margin-bottom:28px">
+                <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:8px">
+                    <div style="width:38px;height:38px;background:linear-gradient(135deg,#1a3260,#3b6fd4);border-radius:10px;display:flex;align-items:center;justify-content:center">
+                        <i class="fa fa-bolt" style="color:#fff;font-size:1rem"></i>
+                    </div>
+                    <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:1.3rem;color:#0f1f3d">XanderSuite</span>
+                </div>
+                <div style="font-size:0.75rem;letter-spacing:2px;text-transform:uppercase;color:#6b7280;font-weight:600">Employee Management</div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Login as</label>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">
+                    <div class="role-option selected" id="roleAdmin" onclick="selectRole('admin')" style="padding:12px;border-radius:10px;border:2px solid var(--brand-500);cursor:pointer;text-align:center;transition:all 0.15s;background:var(--brand-50);">
+                        <i class="fa fa-shield-halved" style="color:#2952a3"></i>
+                        <div style="font-weight:600;font-size:0.85rem">Admin</div>
+                    </div>
+                    <div class="role-option" id="roleManager" onclick="selectRole('manager')" style="padding:12px;border-radius:10px;border:2px solid var(--neutral-200);cursor:pointer;text-align:center;transition:all 0.15s;">
+                        <i class="fa fa-user-tie" style="color:#7c3aed"></i>
+                        <div style="font-weight:600;font-size:0.85rem">Manager</div>
+                    </div>
+                    <div class="role-option" id="roleEmployee" onclick="selectRole('employee')" style="padding:12px;border-radius:10px;border:2px solid var(--neutral-200);cursor:pointer;text-align:center;transition:all 0.15s;">
+                        <i class="fa fa-user" style="color:#6b7280"></i>
+                        <div style="font-weight:600;font-size:0.85rem">Employee</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email address</label>
+                <input class="form-control" type="email" id="loginEmail" placeholder="you@company.com" value="admin@xandersuite.com" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input class="form-control" type="password" id="loginPassword" placeholder="••••••••" value="password" />
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="doLogin()">
+                <i class="fa fa-sign-in-alt"></i> Sign in
+            </button>
+
+            <div style="display:flex;align-items:center;gap:12px;margin:20px 0">
+                <div style="flex:1;height:1px;background:#e5e7eb"></div>
+                <span style="font-size:0.75rem;color:#9ca3af">or try demo</span>
+                <div style="flex:1;height:1px;background:#e5e7eb"></div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+                <button class="btn btn-secondary" style="justify-content:center;font-size:0.8rem" onclick="demoLogin('admin')">
+                    <i class="fa fa-shield-halved"></i> Admin
+                </button>
+                <button class="btn btn-secondary" style="justify-content:center;font-size:0.8rem" onclick="demoLogin('manager')">
+                    <i class="fa fa-user-tie"></i> Mgr
+                </button>
+                <button class="btn btn-secondary" style="justify-content:center;font-size:0.8rem" onclick="demoLogin('employee')">
+                    <i class="fa fa-user"></i> Emp
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── APP SHELL ─── -->
+    <div id="appShell" style="display:none">
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+        <!-- SIDEBAR -->
+        <div id="sidebar">
+            <div class="sidebar-logo">
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:32px;height:32px;background:linear-gradient(135deg,#2952a3,#5a8be8);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                        <i class="fa fa-bolt" style="color:#fff;font-size:0.85rem"></i>
+                    </div>
+                    <div>
+                        <span class="logo-text">XanderSuite</span>
+                        <span class="logo-sub">HRMS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── SIDEBAR ACTION: ADD EMPLOYEE ─── -->
+            <button class="sidebar-action" id="sidebarAddBtn" onclick="openEmployeeDrawer()">
+                <i class="fa fa-plus-circle"></i> Add Employee
+            </button>
+
+            <nav id="sidebarNav" style="flex:1;padding:8px 0;overflow-y:auto"></nav>
+            <div style="padding:16px 20px;border-top:1px solid rgba(255,255,255,0.08)">
+                <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="doLogout()">
+                    <div id="sidebarAvatar" class="avatar-placeholder" style="width:32px;height:32px;font-size:0.72rem"></div>
+                    <div style="flex:1;min-width:0">
+                        <div id="sidebarUserName" style="font-size:0.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+                        <div id="sidebarUserRole" style="font-size:0.68rem;color:rgba(255,255,255,0.5)"></div>
+                    </div>
+                    <i class="fa fa-right-from-bracket" style="color:rgba(255,255,255,0.4);font-size:0.85rem"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- TOPBAR -->
+        <div id="topbar">
+            <button id="mobileMenuBtn" class="icon-btn" onclick="toggleMobileSidebar()" style="margin-right:12px;display:none">
+                <i class="fa fa-bars"></i>
+            </button>
+            <div style="flex:1">
+                <div id="breadcrumbArea" class="breadcrumb">
+                    <span>XanderSuite</span>
+                    <i class="fa fa-chevron-right" style="font-size:0.65rem"></i>
+                    <span class="crumb-active" id="currentPageLabel">Employees</span>
+                </div>
+            </div>
+            <div class="topbar-search">
+                <i class="fa fa-search" style="color:#9ca3af;font-size:0.8rem"></i>
+                <input placeholder="Search employees..." id="globalSearch" oninput="globalSearchFn(this.value)" />
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin-left:16px;position:relative">
+                <div style="position:relative">
+                    <div id="topbarAvatar" class="avatar-placeholder" onclick="toggleUserDropdown()"></div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div style="padding:14px 16px;border-bottom:1px solid #f3f4f6">
+                            <div id="ddUserName" style="font-weight:700;font-size:0.875rem"></div>
+                            <div id="ddUserEmail" style="font-size:0.75rem;color:#6b7280"></div>
+                        </div>
+                        <div class="user-dropdown-item" onclick="navigateTo('myInfo')"><i class="fa fa-user" style="color:#6b7280;width:16px"></i> My Profile</div>
+                        <div class="user-dropdown-item danger" onclick="doLogout()"><i class="fa fa-right-from-bracket" style="width:16px"></i> Sign Out</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN -->
+        <div id="main">
+
+            <!-- ─── EMPLOYEES (main module — contains Dashboard, List, Config) ─── -->
+            <div id="page-employees" class="page-section active">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+                    <div>
+                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;color:var(--neutral-900);">Employee Management</div>
+                        <div style="font-size:0.875rem;color:var(--neutral-500);margin-top:4px;" id="empSubtitle">Full employee lifecycle management</div>
+                    </div>
+                    <!-- Admin-only action buttons -->
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;" id="empActionButtons">
+                        <!-- ADD EMPLOYEE BUTTON INSIDE MODULE -->
+                        <button class="btn btn-primary btn-sm" onclick="openEmployeeDrawer()"><i class="fa fa-plus"></i> Add Employee</button>
+                        <button class="btn btn-secondary btn-sm" onclick="openModal('importModal')"><i class="fa fa-upload"></i> Import</button>
+                        <button class="btn btn-secondary btn-sm" onclick="openModal('onboardingModal')"><i class="fa fa-user-plus"></i> From Onboarding</button>
+                    </div>
+                </div>
+
+                <!-- Tabs: Dashboard | Employee List | Configuration -->
+                <div class="tab-bar" id="empTabs">
+                    <div class="tab-item active" onclick="switchEmpTab('dashboard')">Dashboard</div>
+                    <div class="tab-item" onclick="switchEmpTab('list')">Employee List</div>
+                    <div class="tab-item" onclick="switchEmpTab('config')">Configuration</div>
+                </div>
+
+                <!-- ─── DASHBOARD TAB ─── -->
+                <div id="empTab-dashboard" class="tab-content active">
+                    <div style="margin-bottom:8px;">
+                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.1rem;font-weight:700;color:var(--neutral-900);">Dashboard</div>
+                        <div style="font-size:0.875rem;color:var(--neutral-500);margin-top:2px;" id="dashboardRoleLabel">Company-wide overview</div>
+                    </div>
+
+                    <div class="kpi-grid" id="dashKpiGrid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Employees</div>
+                            <div class="stat-value" id="dashTotalEmp">0</div>
+                            <div style="font-size:0.75rem;color:var(--neutral-500);margin-top:4px;"><span class="stat-change up">+<span id="dashNewHires">0</span></span> new this month</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Departments</div>
+                            <div class="stat-value" id="dashDeptCount">0</div>
+                            <div style="font-size:0.75rem;color:var(--neutral-500);margin-top:4px;">Across <span id="dashDeptList">—</span></div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Managers</div>
+                            <div class="stat-value" id="dashMgrCount">0</div>
+                            <div style="font-size:0.75rem;color:var(--neutral-500);margin-top:4px;">Managing <span id="dashTeamSize">0</span> employees</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Onboarding Pipeline</div>
+                            <div class="stat-value" id="dashOnboardCount">0</div>
+                            <div style="font-size:0.75rem;color:var(--neutral-500);margin-top:4px;">Candidates ready for onboarding</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-users" style="color:var(--brand-600);margin-right:8px;"></i>Recent Employees</div>
+                            <button class="btn btn-secondary btn-sm" onclick="switchEmpTab('list')">View All</button>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="data-table">
+                                <thead><tr><th>Employee</th><th>Department</th><th>Designation</th><th>Status</th><th>Joined</th></tr></thead>
+                                <tbody id="dashRecentBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── EMPLOYEE LIST TAB ─── -->
+                <div id="empTab-list" class="tab-content">
+                    <div style="display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap;align-items:center;">
+                        <input class="form-control" style="max-width:260px;font-size:0.82rem;padding:6px 12px;" placeholder="Search by name, email, dept..." id="empSearch" oninput="renderEmployeeTable()" />
+                        <select class="form-control" style="max-width:150px;font-size:0.82rem;padding:6px 12px;" id="empDeptFilter" onchange="renderEmployeeTable()">
+                            <option value="">All Depts</option>
+                        </select>
+                        <select class="form-control" style="max-width:140px;font-size:0.82rem;padding:6px 12px;" id="empRoleFilter" onchange="renderEmployeeTable()">
+                            <option value="">All Roles</option>
+                            <option value="admin">Admin</option>
+                            <option value="manager">Manager</option>
+                            <option value="employee">Employee</option>
+                        </select>
+                        <select class="form-control" style="max-width:130px;font-size:0.82rem;padding:6px 12px;" id="empStatusFilter" onchange="renderEmployeeTable()">
+                            <option value="">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="Onboarding">Onboarding</option>
+                        </select>
+                        <span style="font-size:0.78rem;color:var(--neutral-500);margin-left:auto;" id="empCountLabel">0 employees</span>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa fa-list" style="color:var(--brand-600);margin-right:8px;"></i>Employee Directory</div>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="data-table" id="empTable">
+                                <thead>
+                                    <tr>
+                                        <th>Employee</th>
+                                        <th>Department</th>
+                                        <th>Designation</th>
+                                        <th>Role</th>
+                                        <th>Manager</th>
+                                        <th>Status</th>
+                                        <th style="text-align:right;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ─── CONFIGURATION TAB ─── -->
+                <div id="empTab-config" class="tab-content">
+                    <div class="card" style="margin-bottom:20px;">
+                        <div class="card-header"><div class="card-title"><i class="fa fa-building" style="color:var(--brand-600);margin-right:8px;"></i>Departments</div></div>
+                        <div class="card-body">
+                            <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+                                <input class="form-control" id="newDeptName" placeholder="New department name" style="flex:1;min-width:180px;font-size:0.85rem;" />
+                                <button class="btn btn-primary btn-sm" onclick="addDepartment()"><i class="fa fa-plus"></i> Add</button>
+                            </div>
+                            <div id="deptListContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom:20px;">
+                        <div class="card-header"><div class="card-title"><i class="fa fa-briefcase" style="color:var(--brand-600);margin-right:8px;"></i>Designations</div></div>
+                        <div class="card-body">
+                            <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+                                <input class="form-control" id="newDesignationName" placeholder="New designation" style="flex:1;min-width:180px;font-size:0.85rem;" />
+                                <button class="btn btn-primary btn-sm" onclick="addDesignation()"><i class="fa fa-plus"></i> Add</button>
+                            </div>
+                            <div id="designationListContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom:20px;">
+                        <div class="card-header"><div class="card-title"><i class="fa fa-venus-mars" style="color:var(--brand-600);margin-right:8px;"></i>Genders</div></div>
+                        <div class="card-body">
+                            <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+                                <input class="form-control" id="newGenderName" placeholder="New gender option" style="flex:1;min-width:180px;font-size:0.85rem;" />
+                                <button class="btn btn-primary btn-sm" onclick="addGender()"><i class="fa fa-plus"></i> Add</button>
+                            </div>
+                            <div id="genderListContainer"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header"><div class="card-title"><i class="fa fa-sliders" style="color:var(--brand-600);margin-right:8px;"></i>Default Settings</div></div>
+                        <div class="card-body">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="form-label">Default Role for New Employees</label>
+                                    <select class="form-control" id="configDefaultRole">
+                                        <option value="employee">Employee</option>
+                                        <option value="manager">Manager</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label class="form-label">Default Status</label>
+                                    <select class="form-control" id="configDefaultStatus">
+                                        <option value="Active">Active</option>
+                                        <option value="Onboarding">Onboarding</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin-bottom:0; grid-column: 1/-1;">
+                                    <label class="form-label">Manager Assignment Required</label>
+                                    <select class="form-control" id="configManagerRequired">
+                                        <option value="yes">Yes (Manager must be selected)</option>
+                                        <option value="no">No (Manager can be left as '—')</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="saveConfig()"><i class="fa fa-save"></i> Save Settings</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ─── DIRECTORY (visible to all) ─── -->
+            <div id="page-directory" class="page-section">
+                <div style="margin-bottom:24px;">
+                    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;color:var(--neutral-900);">Employee Directory</div>
+                    <div style="font-size:0.875rem;color:var(--neutral-500);margin-top:4px;">Find colleagues across the organization</div>
+                </div>
+                <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+                    <input class="form-control" style="max-width:280px;font-size:0.82rem;padding:6px 12px;" placeholder="Search by name..." id="dirSearch" oninput="renderDirectory()" />
+                    <select class="form-control" style="max-width:180px;font-size:0.82rem;padding:6px 12px;" id="dirDeptFilter" onchange="renderDirectory()">
+                        <option value="">All Departments</option>
+                    </select>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px" id="directoryGrid"></div>
+            </div>
+
+            <!-- ─── MY INFO ─── -->
+            <div id="page-myInfo" class="page-section">
+                <div class="profile-header">
+                    <div class="profile-avatar-lg" id="profileAvatarLg"></div>
+                    <div>
+                        <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800" id="profileName"></div>
+                        <div style="opacity:0.8;margin:4px 0" id="profileDesig"></div>
+                        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px">
+                            <div><span style="opacity:0.6;font-size:0.78rem">Employee ID</span><div style="font-weight:600" id="profileId"></div></div>
+                            <div><span style="opacity:0.6;font-size:0.78rem">Department</span><div style="font-weight:600" id="profileDept"></div></div>
+                            <div><span style="opacity:0.6;font-size:0.78rem">Reporting Manager</span><div style="font-weight:600" id="profileManager"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-bar">
+                    <div class="tab-item active" onclick="switchTab('myInfo','personalInfo')">Personal Info</div>
+                    <div class="tab-item" onclick="switchTab('myInfo','employmentInfo')">Employment</div>
+                </div>
+                <div id="myInfoTab-personalInfo" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title">Personal Information</div></div>
+                        <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                            <div><div class="form-label">Full Name</div><div id="piName" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Email</div><div id="piEmail" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Mobile</div><div id="piMobile" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Department</div><div id="piDept" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Date of Birth</div><div id="piDob" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Gender</div><div id="piGender" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="myInfoTab-employmentInfo" class="tab-content">
+                    <div class="card">
+                        <div class="card-header"><div class="card-title">Employment Information</div></div>
+                        <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                            <div><div class="form-label">Employee ID</div><div id="eiId" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Designation</div><div id="eiDesig" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Reporting Manager</div><div id="eiManager" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Employment Type</div><div style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6" id="eiType">Full Time</div></div>
+                            <div><div class="form-label">Join Date</div><div id="eiJoinDate" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                            <div><div class="form-label">Status</div><div id="eiStatus" style="font-size:0.9rem;padding:8px 0;border-bottom:1px solid #f3f4f6"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /main -->
+    </div><!-- /appShell -->
+
+    <!-- ─── RIGHT DRAWER FOR ADD/EDIT EMPLOYEE ─── -->
+    <div class="drawer-overlay" id="employeeDrawerOverlay" onclick="closeEmployeeDrawer()">
+        <div class="drawer-panel" onclick="event.stopPropagation()">
+            <div class="drawer-header">
+                <div class="drawer-title" id="drawerTitle">Add Employee</div>
+                <button class="drawer-close" onclick="closeEmployeeDrawer()"><i class="fa fa-times"></i></button>
+            </div>
+            <div class="drawer-body">
+                <form id="drawerEmpForm" onsubmit="submitDrawerForm(event)">
+                    <input type="hidden" id="drawerEditEmpId" value="" />
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Full Name</label>
+                            <input class="form-control" id="drawerEmpName" placeholder="e.g. John Doe" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Email</label>
+                            <input class="form-control" type="email" id="drawerEmpEmail" placeholder="john@company.com" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Mobile</label>
+                            <input class="form-control" id="drawerEmpMobile" placeholder="+91 98765 43210" required />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Department</label>
+                            <select class="form-control" id="drawerEmpDept" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Designation</label>
+                            <select class="form-control" id="drawerEmpDesig" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Role</label>
+                            <select class="form-control" id="drawerEmpRole" required>
+                                <option value="employee">Employee</option>
+                                <option value="manager">Manager</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reporting Manager</label>
+                            <select class="form-control" id="drawerEmpManager">
+                                <option value="—">— (None)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Status</label>
+                            <select class="form-control" id="drawerEmpStatus" required>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="Onboarding">Onboarding</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input class="form-control" type="date" id="drawerEmpDob" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><span class="required-star">*</span> Gender</label>
+                            <select class="form-control" id="drawerEmpGender" required>
+                                <option value="">Select</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="grid-column:1/-1;">
+                            <label class="form-label">Address</label>
+                            <textarea class="form-control" id="drawerEmpAddress" placeholder="Enter address..." rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:8px;padding-top:16px;border-top:1px solid var(--neutral-200);">
+                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> <span id="drawerBtnText">Add Employee</span></button>
+                        <button type="button" class="btn btn-secondary" onclick="closeEmployeeDrawer()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  MODALS (kept for other uses)                           -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+
+    <!-- ─── IMPORT MODAL ─── -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal-box" style="max-width:600px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div class="modal-title"><i class="fa fa-upload" style="color:var(--brand-600);margin-right:10px;"></i>Import Employees</div>
+                <button class="modal-close" onclick="closeModal('importModal')"><i class="fa fa-times"></i></button>
+            </div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px;">
+                <div class="import-option selected" id="importOptCsv" onclick="selectImportOption('csv')">
+                    <i class="fa fa-file-csv"></i>
+                    <div style="font-weight:600;font-size:0.85rem;">CSV / Excel</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Upload file</div>
+                </div>
+                <div class="import-option" id="importOptUserMgmt" onclick="selectImportOption('usermgmt')">
+                    <i class="fa fa-database"></i>
+                    <div style="font-weight:600;font-size:0.85rem;">User Management</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Sync from system</div>
+                </div>
+                <div class="import-option" id="importOptOnboarding" onclick="selectImportOption('onboarding')">
+                    <i class="fa fa-user-graduate"></i>
+                    <div style="font-weight:600;font-size:0.85rem;">Onboarding</div>
+                    <div style="font-size:0.7rem;color:#6b7280;">Pull candidates</div>
+                </div>
+            </div>
+
+            <div id="importContent">
+                <!-- CSV -->
+                <div id="importCsvPanel">
+                    <div style="border:2px dashed var(--neutral-300);border-radius:12px;padding:32px;text-align:center;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()">
+                        <i class="fa fa-cloud-upload-alt" style="font-size:2rem;color:var(--brand-400);display:block;margin-bottom:10px;"></i>
+                        <div style="font-weight:600;">Click to upload CSV or drag & drop</div>
+                        <div style="font-size:0.75rem;color:#6b7280;margin-top:4px;">Supports .csv, .xlsx</div>
+                        <input type="file" id="csvFileInput" accept=".csv,.xlsx" style="display:none;" onchange="handleCsvImport(event)" />
+                    </div>
+                    <div style="margin-top:12px;font-size:0.75rem;color:#6b7280;">
+                        <i class="fa fa-info-circle"></i> Expected columns: name, email, mobile, department, designation, role, manager, status
+                    </div>
+                </div>
+                <!-- User Management -->
+                <div id="importUserMgmtPanel" style="display:none;">
+                    <div style="background:var(--neutral-50);border-radius:10px;padding:20px;border:1px solid var(--neutral-200);">
+                        <div style="font-weight:600;margin-bottom:8px;">Sync from User Management System</div>
+                        <div style="font-size:0.82rem;color:#6b7280;margin-bottom:12px;">Connect to your existing user management system to import employee records.</div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                            <input class="form-control" placeholder="API Endpoint" style="flex:2;min-width:160px;font-size:0.82rem;" id="umEndpoint" value="https://api.company.com/users" />
+                            <input class="form-control" placeholder="API Key" style="flex:1;min-width:120px;font-size:0.82rem;" id="umApiKey" value="sk-••••••••" type="password" />
+                            <button class="btn btn-primary btn-sm" onclick="syncFromUserManagement()"><i class="fa fa-sync"></i> Sync</button>
+                        </div>
+                        <div style="margin-top:10px;font-size:0.75rem;color:#9ca3af;">
+                            <i class="fa fa-shield"></i> Credentials are encrypted and not stored.
+                        </div>
+                    </div>
+                </div>
+                <!-- Onboarding -->
+                <div id="importOnboardingPanel" style="display:none;">
+                    <div style="background:var(--neutral-50);border-radius:10px;padding:20px;border:1px solid var(--neutral-200);">
+                        <div style="font-weight:600;margin-bottom:8px;">Pull from Onboarding Module</div>
+                        <div style="font-size:0.82rem;color:#6b7280;margin-bottom:12px;">Fetch candidates from the onboarding pipeline and add them as employees.</div>
+                        <button class="btn btn-primary btn-sm" onclick="pullFromOnboarding()"><i class="fa fa-user-plus"></i> Pull Candidates</button>
+                        <div id="pullOnboardingResult" style="margin-top:12px;font-size:0.85rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--neutral-200);display:flex;justify-content:flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal('importModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── ONBOARDING MODAL (Candidates list) ─── -->
+    <div class="modal-overlay" id="onboardingModal">
+        <div class="modal-box" style="max-width:700px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div class="modal-title"><i class="fa fa-user-graduate" style="color:var(--warning);margin-right:10px;"></i>Onboarding Candidates</div>
+                <button class="modal-close" onclick="closeModal('onboardingModal')"><i class="fa fa-times"></i></button>
+            </div>
+            <div id="onboardingCandidateList">
+                <div style="text-align:center;padding:24px;color:#9ca3af;">
+                    <i class="fa fa-spinner fa-spin" style="font-size:1.2rem;display:block;margin-bottom:8px;"></i>
+                    Loading candidates...
+                </div>
+            </div>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--neutral-200);display:flex;justify-content:flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal('onboardingModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── VIEW EMPLOYEE MODAL ─── -->
+    <div class="modal-overlay" id="viewEmpModal">
+        <div class="modal-box" style="max-width:650px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+                <div class="modal-title"><i class="fa fa-id-card" style="color:var(--brand-600);margin-right:10px;"></i>Employee Profile</div>
+                <button class="modal-close" onclick="closeModal('viewEmpModal')"><i class="fa fa-times"></i></button>
+            </div>
+            <div id="viewEmpContent"></div>
+            <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--neutral-200);display:flex;gap:10px;justify-content:flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal('viewEmpModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <!--  SCRIPT                                               -->
+    <!-- ══════════════════════════════════════════════════════════ -->
+    <script>
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DATA
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        const COLORS = ['#2952a3', '#059669', '#d97706', '#7c3aed', '#0891b2', '#db2777', '#ea580c', '#65a30d', '#4f46e5', '#dc2626'];
+
+        // ── Configuration ──
+        let employeeConfig = {
+            departments: ['Engineering', 'QA', 'Design', 'HR', 'Finance', 'Marketing', 'Operations', 'Sales'],
+            designations: ['Software Engineer', 'QA Engineer', 'Product Manager', 'UI/UX Designer', 'HR Manager',
+                'Marketing Manager', 'DevOps Engineer', 'Backend Developer', 'Frontend Developer'
+            ],
+            genders: ['Male', 'Female', 'Other'],
+            defaultRole: 'employee',
+            defaultStatus: 'Active',
+            managerRequired: 'yes'
+        };
+
+        // ── Employees ──
+        let employees = [{
+            id: 'EMP-001',
+            name: 'Arjun Verma',
+            email: 'admin@xandersuite.com',
+            mobile: '+91 98765 43210',
+            dept: 'HR',
+            desig: 'HR Manager',
+            manager: '—',
+            role: 'admin',
+            status: 'Active',
+            joinDate: '2024-01-15',
+            dob: '1985-05-10',
+            gender: 'Male',
+            address: 'Mumbai, India'
+        }, {
+            id: 'EMP-002',
+            name: 'Riya Sharma',
+            email: 'riya@xandersuite.com',
+            mobile: '+91 87654 32101',
+            dept: 'Engineering',
+            desig: 'Frontend Developer',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-03-01',
+            dob: '1992-08-15',
+            gender: 'Female',
+            address: 'Bangalore, India'
+        }, {
+            id: 'EMP-003',
+            name: 'Karan Mehta',
+            email: 'karan@xandersuite.com',
+            mobile: '+91 76543 21012',
+            dept: 'QA',
+            desig: 'QA Engineer',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-04-10',
+            dob: '1991-11-20',
+            gender: 'Male',
+            address: 'Delhi, India'
+        }, {
+            id: 'EMP-004',
+            name: 'Neha Singh',
+            email: 'neha@xandersuite.com',
+            mobile: '+91 65432 10123',
+            dept: 'HR',
+            desig: 'HR Executive',
+            manager: 'Arjun Verma',
+            role: 'admin',
+            status: 'Active',
+            joinDate: '2024-02-15',
+            dob: '1993-03-25',
+            gender: 'Female',
+            address: 'Mumbai, India'
+        }, {
+            id: 'EMP-005',
+            name: 'Pooja Nair',
+            email: 'manager@xandersuite.com',
+            mobile: '+91 54321 01234',
+            dept: 'Engineering',
+            desig: 'Product Owner',
+            manager: 'Arjun Verma',
+            role: 'manager',
+            status: 'Active',
+            joinDate: '2023-11-01',
+            dob: '1988-07-12',
+            gender: 'Female',
+            address: 'Bangalore, India'
+        }, {
+            id: 'EMP-006',
+            name: 'Rahul Das',
+            email: 'rahul@xandersuite.com',
+            mobile: '+91 43210 12345',
+            dept: 'Design',
+            desig: 'UI/UX Designer',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-05-20',
+            dob: '1994-09-08',
+            gender: 'Male',
+            address: 'Hyderabad, India'
+        }, {
+            id: 'EMP-007',
+            name: 'Sana Khan',
+            email: 'sana@xandersuite.com',
+            mobile: '+91 32101 23456',
+            dept: 'Finance',
+            desig: 'Finance Analyst',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-06-01',
+            dob: '1992-12-03',
+            gender: 'Female',
+            address: 'Mumbai, India'
+        }, {
+            id: 'EMP-008',
+            name: 'Vikram Joshi',
+            email: 'vikram@xandersuite.com',
+            mobile: '+91 21012 34567',
+            dept: 'Marketing',
+            desig: 'Marketing Manager',
+            manager: 'Arjun Verma',
+            role: 'manager',
+            status: 'Active',
+            joinDate: '2023-09-15',
+            dob: '1986-04-18',
+            gender: 'Male',
+            address: 'Pune, India'
+        }, {
+            id: 'EMP-009',
+            name: 'Aisha Patel',
+            email: 'aisha@xandersuite.com',
+            mobile: '+91 10123 45678',
+            dept: 'Engineering',
+            desig: 'Backend Developer',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-07-01',
+            dob: '1993-06-22',
+            gender: 'Female',
+            address: 'Ahmedabad, India'
+        }, {
+            id: 'EMP-010',
+            name: 'Dev Kumar',
+            email: 'dev@xandersuite.com',
+            mobile: '+91 90123 45678',
+            dept: 'Engineering',
+            desig: 'DevOps Engineer',
+            manager: 'Pooja Nair',
+            role: 'employee',
+            status: 'Active',
+            joinDate: '2024-08-10',
+            dob: '1991-10-30',
+            gender: 'Male',
+            address: 'Chennai, India'
+        }, ];
+
+        // ── Onboarding Candidates ──
+        let onboardingCandidates = [
+            { id: 'ONB-001', name: 'Priya Menon', email: 'priya.m@example.com', mobile: '+91 98765 11111', dept: 'Engineering',
+                desig: 'Software Engineer', status: 'Onboarding' },
+            { id: 'ONB-002', name: 'Ankit Shah', email: 'ankit.s@example.com', mobile: '+91 98765 22222', dept: 'Design',
+                desig: 'Product Designer', status: 'Onboarding' },
+            { id: 'ONB-003', name: 'Meera Reddy', email: 'meera.r@example.com', mobile: '+91 98765 33333', dept: 'QA',
+                desig: 'QA Lead', status: 'Onboarding' },
+            { id: 'ONB-004', name: 'Rohan Gupta', email: 'rohan.g@example.com', mobile: '+91 98765 44444', dept: 'Marketing',
+                desig: 'Digital Marketing Specialist', status: 'Onboarding' },
+        ];
+
+        // ── Users for login ──
+        const users = {
+            'admin@xandersuite.com': { id: 'EMP-001', name: 'Arjun Verma', email: 'admin@xandersuite.com', role: 'admin',
+                dept: 'HR', desig: 'HR Manager', manager: '—', mobile: '+91 98765 43210' },
+            'manager@xandersuite.com': { id: 'EMP-005', name: 'Pooja Nair', email: 'manager@xandersuite.com',
+                role: 'manager', dept: 'Engineering', desig: 'Product Owner', manager: 'Arjun Verma',
+                mobile: '+91 54321 01234' },
+            'emp@xandersuite.com': { id: 'EMP-002', name: 'Riya Sharma', email: 'riya@xandersuite.com', role: 'employee',
+                dept: 'Engineering', desig: 'Frontend Developer', manager: 'Pooja Nair', mobile: '+91 87654 32101' },
+        };
+
+        // ── State ──
+        let currentUser = null;
+        let currentRole = 'admin';
+        let selectedImportOption = 'csv';
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  HELPERS
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function getEmployee(id) { return employees.find(e => e.id === id); }
+
+        function getEmployeeName(id) { const e = getEmployee(id); return e ? e.name : id; }
+
+        function getManagerOptions() {
+            return employees.filter(e => e.role === 'manager' || e.role === 'admin').map(e => e.name);
+        }
+
+        function getDeptList() {
+            return employeeConfig.departments;
+        }
+
+        function getDesignationList() {
+            return employeeConfig.designations;
+        }
+
+        function getGenderList() {
+            return employeeConfig.genders;
+        }
+
+        function getInitials(name) {
+            return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        }
+
+        function getColorForId(id) {
+            const idx = (id ? id.charCodeAt(id.length - 1) : 0) % COLORS.length;
+            return COLORS[idx];
+        }
+
+        function generateId() {
+            const next = employees.length + 1;
+            return 'EMP-' + String(next).padStart(3, '0');
+        }
+
+        function formatDate(iso) {
+            if (!iso) return '—';
+            const d = new Date(iso + 'T00:00:00');
+            return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function getToday() { return new Date().toISOString().slice(0, 10); }
+
+        function canManageEmployees(user) {
+            return user && user.role === 'admin';
+        }
+
+        function canViewAllEmployees(user) {
+            return user && (user.role === 'admin' || user.role === 'manager');
+        }
+
+        function getManagedEmployees(user) {
+            if (!user) return [];
+            if (user.role === 'admin') return employees;
+            if (user.role === 'manager') {
+                return employees.filter(e => e.manager === user.name || e.id === user.id);
+            }
+            return employees.filter(e => e.id === user.id);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  LOGIN
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        let selectedRole = 'admin';
+
+        function selectRole(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => {
+                el.classList.remove('selected');
+                el.style.background = '#fff';
+                el.style.borderColor = 'var(--neutral-200)';
+            });
+            const el = document.getElementById('role' + role.charAt(0).toUpperCase() + role.slice(1));
+            if (el) {
+                el.classList.add('selected');
+                el.style.background = 'var(--brand-50)';
+                el.style.borderColor = 'var(--brand-500)';
+            }
+            const emailMap = { admin: 'admin@xandersuite.com', manager: 'manager@xandersuite.com',
+            employee: 'emp@xandersuite.com' };
+            document.getElementById('loginEmail').value = emailMap[role] || 'admin@xandersuite.com';
+        }
+
+        function doLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showToast('Please enter credentials', 'error'); return; }
+
+            let user = users[email];
+            if (!user) {
+                const emp = employees.find(e => e.email === email);
+                if (emp) user = { ...emp };
+            }
+            if (!user) { showToast('User not found', 'error'); return; }
+
+            currentUser = user;
+            currentRole = user.role;
+            launchApp();
+        }
+
+        function demoLogin(role) {
+            selectedRole = role;
+            document.querySelectorAll('.role-option').forEach(el => {
+                el.classList.remove('selected');
+                el.style.background = '#fff';
+                el.style.borderColor = 'var(--neutral-200)';
+            });
+            const el = document.getElementById('role' + role.charAt(0).toUpperCase() + role.slice(1));
+            if (el) {
+                el.classList.add('selected');
+                el.style.background = 'var(--brand-50)';
+                el.style.borderColor = 'var(--brand-500)';
+            }
+            const emailMap = { admin: 'admin@xandersuite.com', manager: 'manager@xandersuite.com',
+            employee: 'emp@xandersuite.com' };
+            document.getElementById('loginEmail').value = emailMap[role];
+            document.getElementById('loginPassword').value = 'password';
+            setTimeout(doLogin, 100);
+        }
+
+        function doLogout() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appShell').style.display = 'none';
+            currentUser = null;
+            closeEmployeeDrawer();
+        }
+
+        function launchApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('appShell').style.display = 'block';
+            buildSidebar();
+            buildTopbar();
+            populateDropdowns();
+            // Default to Employees page with Dashboard tab active
+            navigateTo('employees');
+            // Ensure dashboard tab is active
+            switchEmpTab('dashboard');
+            renderAll();
+            updateAdminVisibility();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  SIDEBAR & TOPBAR
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function buildSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = '';
+            // Only admin gets Employees page (which now contains Dashboard)
+            if (currentUser && currentUser.role === 'admin') {
+                const empItem = document.createElement('div');
+                empItem.className = 'nav-item active';
+                empItem.dataset.key = 'employees';
+                empItem.onclick = () => { navigateTo('employees');
+                    switchEmpTab('dashboard'); };
+                empItem.innerHTML = `<i class="fa fa-users"></i><span>Employees</span>`;
+                nav.appendChild(empItem);
+            }
+
+            // Everyone gets Directory and My Info
+            const items = [
+                { key: 'directory', icon: 'fa-address-book', label: 'Directory' },
+                { key: 'myInfo', icon: 'fa-id-card', label: 'My Info' }
+            ];
+
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'nav-item';
+                div.dataset.key = item.key;
+                div.onclick = () => navigateTo(item.key);
+                div.innerHTML =
+                    `<i class="fa ${item.icon}"></i><span>${item.label}</span>`;
+                nav.appendChild(div);
+            });
+            updateNavBadges();
+        }
+
+        function buildTopbar() {
+            const u = currentUser;
+            const initials = getInitials(u.name);
+            const color = getColorForId(u.id);
+            document.getElementById('sidebarAvatar').textContent = initials;
+            document.getElementById('sidebarAvatar').style.background = color;
+            document.getElementById('sidebarUserName').textContent = u.name;
+            document.getElementById('sidebarUserRole').textContent = u.role.charAt(0).toUpperCase() + u.role.slice(1) +
+                ' · ' + u.dept;
+            document.getElementById('topbarAvatar').textContent = initials;
+            document.getElementById('topbarAvatar').style.background = color;
+            document.getElementById('ddUserName').textContent = u.name;
+            document.getElementById('ddUserEmail').textContent = u.email;
+
+            // Hide/show Add Employee button based on role
+            const addBtn = document.getElementById('sidebarAddBtn');
+            if (addBtn) {
+                addBtn.style.display = (currentUser && currentUser.role === 'admin') ? 'flex' : 'none';
+            }
+        }
+
+        function updateNavBadges() {
+            // No badge for now
+        }
+
+        function updateAdminVisibility() {
+            const isAdmin = currentUser && currentUser.role === 'admin';
+            const actions = document.getElementById('empActionButtons');
+            if (actions) actions.style.display = isAdmin ? 'flex' : 'none';
+            const addBtn = document.getElementById('sidebarAddBtn');
+            if (addBtn) addBtn.style.display = isAdmin ? 'flex' : 'none';
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  NAVIGATION
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function navigateTo(key) {
+            closeAllDropdowns();
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            const page = document.getElementById('page-' + key);
+            if (page) page.classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(n => {
+                n.classList.toggle('active', n.dataset.key === key);
+            });
+
+            const labels = {
+                employees: 'Employees',
+                directory: 'Directory',
+                myInfo: 'My Info'
+            };
+            document.getElementById('currentPageLabel').textContent = labels[key] || key;
+
+            if (key === 'employees') {
+                renderAll();
+                // ensure dashboard tab is active by default when navigating to employees
+                const activeTab = document.querySelector('#empTabs .tab-item.active');
+                if (!activeTab || activeTab.textContent.trim() !== 'Dashboard') {
+                    switchEmpTab('dashboard');
+                }
+                renderAll();
+            }
+            if (key === 'directory') renderDirectory();
+            if (key === 'myInfo') renderMyInfo();
+
+            closeMobileSidebar();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  EMPLOYEE TAB SWITCH (Dashboard / List / Config)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function switchEmpTab(tab) {
+            document.querySelectorAll('#empTabs .tab-item').forEach(t => {
+                const txt = t.textContent.trim().toLowerCase();
+                t.classList.toggle('active', txt === tab || (tab === 'dashboard' && txt === 'dashboard'));
+            });
+            document.querySelectorAll('#empTab-dashboard, #empTab-list, #empTab-config').forEach(el => {
+                el.classList.remove('active');
+            });
+            const target = document.getElementById('empTab-' + tab);
+            if (target) target.classList.add('active');
+            if (tab === 'dashboard') renderDashboard();
+            if (tab === 'list') renderEmployeeTable();
+            if (tab === 'config') renderConfigPage();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  CONFIG PAGE (rendered inside Employees tab)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderConfigPage() {
+            renderDeptList();
+            renderDesignationList();
+            renderGenderList();
+            // Set default values
+            document.getElementById('configDefaultRole').value = employeeConfig.defaultRole || 'employee';
+            document.getElementById('configDefaultStatus').value = employeeConfig.defaultStatus || 'Active';
+            document.getElementById('configManagerRequired').value = employeeConfig.managerRequired || 'yes';
+        }
+
+        function renderDeptList() {
+            const container = document.getElementById('deptListContainer');
+            if (!container) return;
+            container.innerHTML = employeeConfig.departments.map((d, i) => `
+            <div class="config-item">
+              <span class="name">${d}</span>
+              <div class="actions">
+                <button class="btn btn-danger btn-sm btn-icon" onclick="removeDepartment(${i})" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        function renderDesignationList() {
+            const container = document.getElementById('designationListContainer');
+            if (!container) return;
+            container.innerHTML = employeeConfig.designations.map((d, i) => `
+            <div class="config-item">
+              <span class="name">${d}</span>
+              <div class="actions">
+                <button class="btn btn-danger btn-sm btn-icon" onclick="removeDesignation(${i})" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        function renderGenderList() {
+            const container = document.getElementById('genderListContainer');
+            if (!container) return;
+            container.innerHTML = employeeConfig.genders.map((g, i) => `
+            <div class="config-item">
+              <span class="name">${g}</span>
+              <div class="actions">
+                <button class="btn btn-danger btn-sm btn-icon" onclick="removeGender(${i})" title="Remove"><i class="fa fa-times"></i></button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        function addDepartment() {
+            const input = document.getElementById('newDeptName');
+            const name = input.value.trim();
+            if (!name) { showToast('Please enter a department name', 'error'); return; }
+            if (employeeConfig.departments.includes(name)) { showToast('Department already exists', 'warning'); return; }
+            employeeConfig.departments.push(name);
+            input.value = '';
+            renderDeptList();
+            populateDropdowns();
+            showToast('Department added');
+        }
+
+        function removeDepartment(index) {
+            if (employeeConfig.departments.length <= 1) {
+                showToast('Cannot remove the last department', 'warning');
+                return;
+            }
+            const name = employeeConfig.departments[index];
+            employeeConfig.departments.splice(index, 1);
+            renderDeptList();
+            populateDropdowns();
+            showToast(`Department "${name}" removed`);
+        }
+
+        function addDesignation() {
+            const input = document.getElementById('newDesignationName');
+            const name = input.value.trim();
+            if (!name) { showToast('Please enter a designation', 'error'); return; }
+            if (employeeConfig.designations.includes(name)) { showToast('Designation already exists', 'warning'); return; }
+            employeeConfig.designations.push(name);
+            input.value = '';
+            renderDesignationList();
+            populateDropdowns();
+            showToast('Designation added');
+        }
+
+        function removeDesignation(index) {
+            if (employeeConfig.designations.length <= 1) {
+                showToast('Cannot remove the last designation', 'warning');
+                return;
+            }
+            const name = employeeConfig.designations[index];
+            employeeConfig.designations.splice(index, 1);
+            renderDesignationList();
+            populateDropdowns();
+            showToast(`Designation "${name}" removed`);
+        }
+
+        function addGender() {
+            const input = document.getElementById('newGenderName');
+            const name = input.value.trim();
+            if (!name) { showToast('Please enter a gender option', 'error'); return; }
+            if (employeeConfig.genders.includes(name)) { showToast('Gender already exists', 'warning'); return; }
+            employeeConfig.genders.push(name);
+            input.value = '';
+            renderGenderList();
+            populateDropdowns();
+            showToast('Gender option added');
+        }
+
+        function removeGender(index) {
+            if (employeeConfig.genders.length <= 1) {
+                showToast('Cannot remove the last gender option', 'warning');
+                return;
+            }
+            const name = employeeConfig.genders[index];
+            employeeConfig.genders.splice(index, 1);
+            renderGenderList();
+            populateDropdowns();
+            showToast(`Gender "${name}" removed`);
+        }
+
+        function saveConfig() {
+            employeeConfig.defaultRole = document.getElementById('configDefaultRole').value;
+            employeeConfig.defaultStatus = document.getElementById('configDefaultStatus').value;
+            employeeConfig.managerRequired = document.getElementById('configManagerRequired').value;
+            showToast('Configuration saved successfully!');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DASHBOARD
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderDashboard() {
+            const visible = canViewAllEmployees(currentUser) ? employees : getManagedEmployees(currentUser);
+            const total = visible.length;
+            const depts = [...new Set(visible.map(e => e.dept))];
+            const mgrs = visible.filter(e => e.role === 'manager' || e.role === 'admin');
+            const active = visible.filter(e => e.status === 'Active');
+            const onboarding = visible.filter(e => e.status === 'Onboarding');
+
+            document.getElementById('dashTotalEmp').textContent = total;
+            document.getElementById('dashDeptCount').textContent = depts.length;
+            document.getElementById('dashDeptList').textContent = depts.slice(0, 3).join(', ') + (depts.length > 3 ?
+                ' +' + (depts.length - 3) : '');
+            document.getElementById('dashMgrCount').textContent = mgrs.length;
+            document.getElementById('dashTeamSize').textContent = active.length - mgrs.length;
+            document.getElementById('dashOnboardCount').textContent = onboarding.length;
+
+            const thisMonth = new Date().getMonth();
+            const thisYear = new Date().getFullYear();
+            const newHires = visible.filter(e => {
+                if (!e.joinDate) return false;
+                const d = new Date(e.joinDate + 'T00:00:00');
+                return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+            });
+            document.getElementById('dashNewHires').textContent = newHires.length;
+
+            const recent = visible.slice(0, 5);
+            const tbody = document.getElementById('dashRecentBody');
+            tbody.innerHTML = recent.length ? recent.map(e => `
+            <tr onclick="viewEmployee('${e.id}')" style="cursor:pointer;">
+              <td><div style="font-weight:600;">${e.name}</div><div style="font-size:0.75rem;color:#6b7280;">${e.email}</div></td>
+              <td><span class="badge badge-blue">${e.dept}</span></td>
+              <td>${e.desig}</td>
+              <td><span class="badge ${e.status === 'Active' ? 'badge-green' : e.status === 'Onboarding' ? 'badge-yellow' : 'badge-red'}">${e.status}</span></td>
+              <td>${formatDate(e.joinDate)}</td>
+            </tr>
+          `).join('') :
+                `<tr><td colspan="5" style="text-align:center;color:#9ca3af;padding:24px;">No employees found</td></tr>`;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  EMPLOYEE TABLE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderEmployeeTable() {
+            const search = (document.getElementById('empSearch')?.value || '').toLowerCase();
+            const dept = document.getElementById('empDeptFilter')?.value || '';
+            const role = document.getElementById('empRoleFilter')?.value || '';
+            const status = document.getElementById('empStatusFilter')?.value || '';
+
+            let visible = canViewAllEmployees(currentUser) ? employees : getManagedEmployees(currentUser);
+
+            visible = visible.filter(e => {
+                const matchSearch = !search || e.name.toLowerCase().includes(search) || e.email.toLowerCase()
+                .includes(search) || e.dept.toLowerCase().includes(search);
+                const matchDept = !dept || e.dept === dept;
+                const matchRole = !role || e.role === role;
+                const matchStatus = !status || e.status === status;
+                return matchSearch && matchDept && matchRole && matchStatus;
+            });
+
+            document.getElementById('empCountLabel').textContent = visible.length + ' employees';
+
+            const tbody = document.getElementById('empTableBody');
+            const isAdmin = currentUser && currentUser.role === 'admin';
+
+            tbody.innerHTML = visible.length ? visible.map(e => `
+            <tr>
+              <td><div style="font-weight:600;">${e.name}</div><div style="font-size:0.75rem;color:#6b7280;">${e.email}</div></td>
+              <td><span class="badge badge-blue">${e.dept}</span></td>
+              <td>${e.desig}</td>
+              <td><span class="badge ${e.role === 'admin' ? 'badge-purple' : e.role === 'manager' ? 'badge-indigo' : 'badge-gray'}">${e.role}</span></td>
+              <td>${e.manager || '—'}</td>
+              <td><span class="badge ${e.status === 'Active' ? 'badge-green' : e.status === 'Onboarding' ? 'badge-yellow' : 'badge-red'}">${e.status}</span></td>
+              <td style="text-align:right;white-space:nowrap;">
+                <button class="btn btn-secondary btn-sm btn-icon" onclick="viewEmployee('${e.id}')" title="View"><i class="fa fa-eye"></i></button>
+                ${isAdmin ? `
+                  <button class="btn btn-secondary btn-sm btn-icon" onclick="editEmployee('${e.id}')" title="Edit"><i class="fa fa-pen"></i></button>
+                  <button class="btn btn-danger btn-sm btn-icon" onclick="deleteEmployee('${e.id}')" title="Delete"><i class="fa fa-trash"></i></button>
+                ` : ''}
+              </td>
+            </tr>
+          `).join('') :
+                `<tr><td colspan="7" style="text-align:center;color:#9ca3af;padding:32px;">No employees match your criteria</td></tr>`;
+
+            populateDeptFilter();
+        }
+
+        function populateDeptFilter() {
+            const depts = getDeptList();
+            const sel = document.getElementById('empDeptFilter');
+            const current = sel.value;
+            sel.innerHTML = '<option value="">All Depts</option>' + depts.map(d =>
+                `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+            // also for directory
+            const dirSel = document.getElementById('dirDeptFilter');
+            if (dirSel) {
+                const cur = dirSel.value;
+                dirSel.innerHTML = '<option value="">All Departments</option>' + depts.map(d =>
+                    `<option value="${d}" ${d === cur ? 'selected' : ''}>${d}</option>`).join('');
+            }
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  EMPLOYEE CRUD (using drawer)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function openEmployeeDrawer(editId) {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can add or edit employees', 'error');
+                return;
+            }
+            const overlay = document.getElementById('employeeDrawerOverlay');
+            const panel = overlay.querySelector('.drawer-panel');
+            // Reset form
+            document.getElementById('drawerEditEmpId').value = editId || '';
+            if (editId) {
+                document.getElementById('drawerTitle').textContent = 'Edit Employee';
+                document.getElementById('drawerBtnText').textContent = 'Update Employee';
+                const emp = getEmployee(editId);
+                if (emp) {
+                    document.getElementById('drawerEmpName').value = emp.name || '';
+                    document.getElementById('drawerEmpEmail').value = emp.email || '';
+                    document.getElementById('drawerEmpMobile').value = emp.mobile || '';
+                    document.getElementById('drawerEmpDept').value = emp.dept || '';
+                    document.getElementById('drawerEmpDesig').value = emp.desig || '';
+                    document.getElementById('drawerEmpRole').value = emp.role || 'employee';
+                    document.getElementById('drawerEmpStatus').value = emp.status || 'Active';
+                    document.getElementById('drawerEmpDob').value = emp.dob || '';
+                    document.getElementById('drawerEmpGender').value = emp.gender || '';
+                    document.getElementById('drawerEmpAddress').value = emp.address || '';
+                    const mgrSel = document.getElementById('drawerEmpManager');
+                    mgrSel.value = emp.manager || '—';
+                }
+            } else {
+                document.getElementById('drawerTitle').textContent = 'Add Employee';
+                document.getElementById('drawerBtnText').textContent = 'Add Employee';
+                document.getElementById('drawerEmpForm').reset();
+                document.getElementById('drawerEmpStatus').value = employeeConfig.defaultStatus || 'Active';
+                document.getElementById('drawerEmpRole').value = employeeConfig.defaultRole || 'employee';
+                document.getElementById('drawerEmpGender').value = '';
+                document.getElementById('drawerEditEmpId').value = '';
+            }
+            populateDrawerDropdowns();
+            overlay.classList.add('open');
+            panel.style.transform = 'translateX(0)';
+            // slight delay to allow transition
+            setTimeout(() => {
+                overlay.style.opacity = '1';
+            }, 10);
+        }
+
+        function closeEmployeeDrawer() {
+            const overlay = document.getElementById('employeeDrawerOverlay');
+            const panel = overlay.querySelector('.drawer-panel');
+            overlay.classList.remove('open');
+            panel.style.transform = 'translateX(100%)';
+            overlay.style.opacity = '0';
+        }
+
+        function populateDrawerDropdowns() {
+            populateDrawerDept();
+            populateDrawerDesig();
+            populateDrawerGender();
+            populateDrawerManager();
+        }
+
+        function populateDrawerDept() {
+            const sel = document.getElementById('drawerEmpDept');
+            const depts = getDeptList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + depts.map(d =>
+                `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        function populateDrawerDesig() {
+            const sel = document.getElementById('drawerEmpDesig');
+            const desigs = getDesignationList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + desigs.map(d =>
+                `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        function populateDrawerGender() {
+            const sel = document.getElementById('drawerEmpGender');
+            const genders = getGenderList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + genders.map(g =>
+                `<option value="${g}" ${g === current ? 'selected' : ''}>${g}</option>`).join('');
+        }
+
+        function populateDrawerManager() {
+            const sel = document.getElementById('drawerEmpManager');
+            if (!sel) return;
+            const mgrs = getManagerOptions();
+            const current = sel.value;
+            sel.innerHTML = '<option value="—">— (None)</option>';
+            mgrs.forEach(m => {
+                const o = document.createElement('option');
+                o.value = m;
+                o.textContent = m;
+                if (m === current) o.selected = true;
+                sel.appendChild(o);
+            });
+        }
+
+        function submitDrawerForm(e) {
+            e.preventDefault();
+            const editId = document.getElementById('drawerEditEmpId').value;
+            const data = {
+                name: document.getElementById('drawerEmpName').value.trim(),
+                email: document.getElementById('drawerEmpEmail').value.trim(),
+                mobile: document.getElementById('drawerEmpMobile').value.trim(),
+                dept: document.getElementById('drawerEmpDept').value,
+                desig: document.getElementById('drawerEmpDesig').value,
+                role: document.getElementById('drawerEmpRole').value,
+                manager: document.getElementById('drawerEmpManager').value || '—',
+                status: document.getElementById('drawerEmpStatus').value,
+                dob: document.getElementById('drawerEmpDob').value || '',
+                gender: document.getElementById('drawerEmpGender').value || '',
+                address: document.getElementById('drawerEmpAddress').value.trim() || '',
+            };
+
+            if (!data.name || !data.email || !data.mobile || !data.dept || !data.desig || !data.gender) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+
+            if (employeeConfig.managerRequired === 'yes' && data.manager === '—') {
+                showToast('Manager assignment is required. Please select a manager.', 'error');
+                return;
+            }
+
+            if (editId) {
+                const idx = employees.findIndex(e => e.id === editId);
+                if (idx === -1) { showToast('Employee not found', 'error'); return; }
+                employees[idx] = { ...employees[idx], ...data };
+                showToast('Employee updated successfully!');
+            } else {
+                const id = generateId();
+                employees.push({
+                    id,
+                    ...data,
+                    joinDate: getToday(),
+                    status: data.status || 'Active',
+                });
+                showToast('Employee added successfully!');
+            }
+
+            closeEmployeeDrawer();
+            renderAll();
+        }
+
+        function editEmployee(id) { openEmployeeDrawer(id); }
+
+        function deleteEmployee(id) {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can delete employees', 'error');
+                return;
+            }
+            if (!confirm('Are you sure you want to delete this employee?')) return;
+            const idx = employees.findIndex(e => e.id === id);
+            if (idx === -1) { showToast('Employee not found', 'error'); return; }
+            employees.splice(idx, 1);
+            showToast('Employee deleted');
+            renderAll();
+        }
+
+        function viewEmployee(id) {
+            const e = getEmployee(id);
+            if (!e) { showToast('Employee not found', 'error'); return; }
+            const initials = getInitials(e.name);
+            const color = getColorForId(e.id);
+
+            document.getElementById('viewEmpContent').innerHTML = `
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #f3f4f6;">
+              <div style="width:60px;height:60px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.2rem;">${initials}</div>
+              <div>
+                <div style="font-weight:800;font-size:1.1rem;font-family:'Plus Jakarta Sans',sans-serif;">${e.name}</div>
+                <div style="color:#6b7280;">${e.desig} · ${e.dept}</div>
+                <div style="margin-top:4px;"><span class="badge ${e.status === 'Active' ? 'badge-green' : e.status === 'Onboarding' ? 'badge-yellow' : 'badge-red'}">${e.status}</span> <span class="badge ${e.role === 'admin' ? 'badge-purple' : e.role === 'manager' ? 'badge-indigo' : 'badge-gray'}">${e.role}</span></div>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Employee ID</div><div style="margin-top:3px;">${e.id}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Email</div><div style="margin-top:3px;">${e.email}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Mobile</div><div style="margin-top:3px;">${e.mobile}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Reporting Manager</div><div style="margin-top:3px;">${e.manager || '—'}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Date of Birth</div><div style="margin-top:3px;">${formatDate(e.dob)}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Gender</div><div style="margin-top:3px;">${e.gender || '—'}</div></div>
+              <div style="grid-column:1/-1;"><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Address</div><div style="margin-top:3px;">${e.address || '—'}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Join Date</div><div style="margin-top:3px;">${formatDate(e.joinDate)}</div></div>
+              <div><div style="font-size:0.75rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Employment Type</div><div style="margin-top:3px;">Full Time</div></div>
+            </div>
+          `;
+            openModal('viewEmpModal');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  ONBOARDING
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function openOnboardingModal() {
+            const container = document.getElementById('onboardingCandidateList');
+            if (!container) return;
+            if (onboardingCandidates.length === 0) {
+                container.innerHTML = `
+              <div style="text-align:center;padding:24px;color:#9ca3af;">
+                <i class="fa fa-user-check" style="font-size:1.5rem;display:block;margin-bottom:8px;"></i>
+                No candidates in pipeline.
+              </div>
+            `;
+            } else {
+                const isAdmin = currentUser && currentUser.role === 'admin';
+                container.innerHTML = onboardingCandidates.map(c => `
+              <div class="candidate-card" style="margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <div style="width:40px;height:40px;border-radius:50%;background:var(--brand-100);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand-600);font-size:0.85rem;">${getInitials(c.name)}</div>
+                  <div>
+                    <div style="font-weight:600;">${c.name}</div>
+                    <div style="font-size:0.78rem;color:#6b7280;">${c.desig} · ${c.dept}</div>
+                    <div style="font-size:0.7rem;color:#9ca3af;">${c.email} · ${c.mobile}</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <span class="onboarding-badge">Onboarding</span>
+                  ${isAdmin ? `
+                    <button class="btn btn-success btn-sm" onclick="onboardCandidate('${c.id}')"><i class="fa fa-check"></i> Onboard</button>
+                    <button class="btn btn-danger btn-sm btn-icon" onclick="removeOnboardingCandidate('${c.id}')" title="Remove"><i class="fa fa-times"></i></button>
+                  ` : `
+                    <span style="font-size:0.75rem;color:#6b7280;">(Admin only)</span>
+                  `}
+                </div>
+              </div>
+            `).join('');
+            }
+            openModal('onboardingModal');
+        }
+
+        function onboardCandidate(id) {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can onboard candidates', 'error');
+                return;
+            }
+            const idx = onboardingCandidates.findIndex(c => c.id === id);
+            if (idx === -1) { showToast('Candidate not found', 'error'); return; }
+            const c = onboardingCandidates[idx];
+
+            const empId = generateId();
+            employees.push({
+                id: empId,
+                name: c.name,
+                email: c.email,
+                mobile: c.mobile,
+                dept: c.dept,
+                desig: c.desig,
+                manager: '—',
+                role: employeeConfig.defaultRole || 'employee',
+                status: employeeConfig.defaultStatus || 'Active',
+                joinDate: getToday(),
+                dob: '',
+                gender: '',
+                address: '',
+            });
+
+            onboardingCandidates.splice(idx, 1);
+            showToast(`🎉 ${c.name} has been onboarded as an employee!`);
+            renderAll();
+            openOnboardingModal();
+        }
+
+        function removeOnboardingCandidate(id) {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can remove candidates', 'error');
+                return;
+            }
+            if (!confirm('Remove this candidate from the onboarding pipeline?')) return;
+            const idx = onboardingCandidates.findIndex(c => c.id === id);
+            if (idx === -1) return;
+            onboardingCandidates.splice(idx, 1);
+            showToast('Candidate removed', 'info');
+            renderAll();
+            openOnboardingModal();
+        }
+
+        function refreshOnboardingCandidates() {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can refresh onboarding candidates', 'error');
+                return;
+            }
+            showToast('Refreshing onboarding candidates...', 'info');
+            setTimeout(() => {
+                if (Math.random() > 0.6) {
+                    const names = ['Sneha Reddy', 'Arjun Nair', 'Maya Iyer', 'Ravi Desai'];
+                    const depts = employeeConfig.departments;
+                    const desigs = employeeConfig.designations;
+                    const idx = Math.floor(Math.random() * names.length);
+                    onboardingCandidates.push({
+                        id: 'ONB-' + Date.now(),
+                        name: names[idx],
+                        email: names[idx].toLowerCase().replace(' ', '.') + '@example.com',
+                        mobile: '+91 9' + Math.floor(Math.random() * 90000000 + 10000000),
+                        dept: depts[idx % depts.length] || 'Engineering',
+                        desig: desigs[idx % desigs.length] || 'Software Engineer',
+                        status: 'Onboarding'
+                    });
+                    showToast('New candidate added to pipeline!');
+                } else {
+                    showToast('Pipeline up to date');
+                }
+                renderAll();
+                if (document.getElementById('onboardingModal').classList.contains('open')) {
+                    openOnboardingModal();
+                }
+            }, 600);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  IMPORT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function selectImportOption(opt) {
+            selectedImportOption = opt;
+            document.querySelectorAll('.import-option').forEach(el => {
+                el.classList.remove('selected');
+                el.style.borderColor = 'var(--neutral-200)';
+                el.style.background = '#fff';
+            });
+            const el = document.getElementById('importOpt' + opt.charAt(0).toUpperCase() + opt.slice(1));
+            if (el) {
+                el.classList.add('selected');
+                el.style.borderColor = 'var(--brand-600)';
+                el.style.background = 'var(--brand-50)';
+            }
+            document.getElementById('importCsvPanel').style.display = opt === 'csv' ? 'block' : 'none';
+            document.getElementById('importUserMgmtPanel').style.display = opt === 'usermgmt' ? 'block' : 'none';
+            document.getElementById('importOnboardingPanel').style.display = opt === 'onboarding' ? 'block' : 'none';
+        }
+
+        function handleCsvImport(event) {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can import employees', 'error');
+                return;
+            }
+            const file = event.target.files[0];
+            if (!file) return;
+            showToast('Processing ' + file.name + '...', 'info');
+
+            setTimeout(() => {
+                const count = Math.floor(Math.random() * 3) + 1;
+                const names = ['Imported User A', 'Imported User B', 'Imported User C'];
+                const depts = employeeConfig.departments;
+                const desigs = employeeConfig.designations;
+                for (let i = 0; i < count; i++) {
+                    const name = names[i % names.length] + (i > 0 ? ' ' + (i + 1) : '');
+                    employees.push({
+                        id: generateId(),
+                        name: name,
+                        email: name.toLowerCase().replace(/ /g, '.') + '@imported.com',
+                        mobile: '+91 9' + Math.floor(Math.random() * 90000000 + 10000000),
+                        dept: depts[i % depts.length] || 'Engineering',
+                        desig: desigs[i % desigs.length] || 'Imported Role',
+                        manager: '—',
+                        role: employeeConfig.defaultRole || 'employee',
+                        status: employeeConfig.defaultStatus || 'Active',
+                        joinDate: getToday(),
+                        dob: '',
+                        gender: '',
+                        address: '',
+                    });
+                }
+                showToast(`Imported ${count} employees from ${file.name}`);
+                renderAll();
+                closeModal('importModal');
+            }, 800);
+        }
+
+        function syncFromUserManagement() {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can sync from user management', 'error');
+                return;
+            }
+            const endpoint = document.getElementById('umEndpoint').value;
+            if (!endpoint) { showToast('Please enter an API endpoint', 'error'); return; }
+            showToast('Syncing from user management...', 'info');
+
+            setTimeout(() => {
+                const count = Math.floor(Math.random() * 3) + 2;
+                const names = ['Synced User 1', 'Synced User 2', 'Synced User 3', 'Synced User 4'];
+                const depts = employeeConfig.departments;
+                const desigs = employeeConfig.designations;
+                for (let i = 0; i < count; i++) {
+                    const name = names[i % names.length] + (i > 0 ? ' ' + (i + 1) : '');
+                    employees.push({
+                        id: generateId(),
+                        name: name,
+                        email: name.toLowerCase().replace(/ /g, '.') + '@synced.com',
+                        mobile: '+91 9' + Math.floor(Math.random() * 90000000 + 10000000),
+                        dept: depts[i % depts.length] || 'Engineering',
+                        desig: desigs[i % desigs.length] || 'Synced Role',
+                        manager: '—',
+                        role: employeeConfig.defaultRole || 'employee',
+                        status: employeeConfig.defaultStatus || 'Active',
+                        joinDate: getToday(),
+                        dob: '',
+                        gender: '',
+                        address: '',
+                    });
+                }
+                showToast(`Synced ${count} employees from user management`);
+                renderAll();
+                closeModal('importModal');
+            }, 900);
+        }
+
+        function pullFromOnboarding() {
+            if (!canManageEmployees(currentUser)) {
+                showToast('Only administrators can pull from onboarding', 'error');
+                return;
+            }
+            if (onboardingCandidates.length === 0) {
+                showToast('No onboarding candidates available', 'warning');
+                return;
+            }
+            const count = onboardingCandidates.length;
+            onboardingCandidates.forEach(c => {
+                employees.push({
+                    id: generateId(),
+                    name: c.name,
+                    email: c.email,
+                    mobile: c.mobile,
+                    dept: c.dept,
+                    desig: c.desig,
+                    manager: '—',
+                    role: employeeConfig.defaultRole || 'employee',
+                    status: employeeConfig.defaultStatus || 'Active',
+                    joinDate: getToday(),
+                    dob: '',
+                    gender: '',
+                    address: '',
+                });
+            });
+            onboardingCandidates = [];
+            showToast(`🎉 Pulled ${count} candidates from onboarding!`);
+            renderAll();
+            updateNavBadges();
+            closeModal('importModal');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DIRECTORY
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderDirectory() {
+            const search = (document.getElementById('dirSearch')?.value || '').toLowerCase();
+            const dept = document.getElementById('dirDeptFilter')?.value || '';
+
+            let visible = canViewAllEmployees(currentUser) ? employees : getManagedEmployees(currentUser);
+
+            visible = visible.filter(e => {
+                const matchSearch = !search || e.name.toLowerCase().includes(search) || e.desig.toLowerCase()
+                .includes(search);
+                const matchDept = !dept || e.dept === dept;
+                return matchSearch && matchDept;
+            });
+
+            const grid = document.getElementById('directoryGrid');
+            grid.innerHTML = visible.map(e => {
+                const initials = getInitials(e.name);
+                const color = getColorForId(e.id);
+                return `
+              <div class="emp-card" onclick="viewEmployee('${e.id}')">
+                <div class="emp-avatar" style="background:${color}">${initials}</div>
+                <div style="font-weight:700;font-size:0.9rem">${e.name}</div>
+                <div style="font-size:0.78rem;color:#6b7280;margin-top:3px">${e.desig}</div>
+                <div style="margin-top:6px"><span class="badge badge-blue" style="font-size:0.68rem">${e.dept}</span></div>
+                ${e.manager && e.manager !== '—' ? `<div style="font-size:0.7rem;color:#9ca3af;margin-top:4px;">Reports to: ${e.manager}</div>` : ''}
+                <div style="font-size:0.75rem;color:#9ca3af;margin-top:8px">${e.email}</div>
+              </div>
+            `;
+            }).join('') || `<div style="grid-column:1/-1;text-align:center;color:#9ca3af;padding:32px;">No employees found</div>`;
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  MY INFO
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderMyInfo() {
+            const u = currentUser;
+            const initials = getInitials(u.name);
+            const av = document.getElementById('profileAvatarLg');
+            if (av) { av.textContent = initials;
+                av.style.background = getColorForId(u.id); }
+
+            const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val || '—'; };
+            set('profileName', u.name);
+            set('profileDesig', `${u.desig} · ${u.dept}`);
+            set('profileId', u.id);
+            set('profileDept', u.dept);
+            set('profileManager', u.manager || '—');
+            set('piName', u.name);
+            set('piMobile', u.mobile);
+            set('piEmail', u.email);
+            set('piDept', u.dept);
+
+            const emp = getEmployee(u.id);
+            set('piDob', formatDate(emp?.dob));
+            set('piGender', emp?.gender || '—');
+            set('eiId', u.id);
+            set('eiDesig', u.desig);
+            set('eiManager', u.manager || '—');
+            set('eiJoinDate', formatDate(emp?.joinDate));
+            set('eiStatus', emp?.status || 'Active');
+            set('eiType', 'Full Time');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DROPDOWNS (for modals and drawer)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function populateDropdowns() {
+            populateManagerDropdown();
+            populateDeptFilter();
+            populateDeptDropdown();
+            populateDesignationDropdown();
+            populateGenderDropdown();
+            populateDrawerDropdowns();
+        }
+
+        function populateManagerDropdown() {
+            const sel = document.getElementById('empFormManager');
+            if (!sel) return;
+            const mgrs = getManagerOptions();
+            const current = sel.value;
+            sel.innerHTML = '<option value="—">— (None)</option>';
+            mgrs.forEach(m => {
+                const o = document.createElement('option');
+                o.value = m;
+                o.textContent = m;
+                if (m === current) o.selected = true;
+                sel.appendChild(o);
+            });
+        }
+
+        // These are for the old modal – we keep them for compatibility but they are not used anymore.
+        function populateDeptDropdown() {
+            const sel = document.getElementById('empFormDept');
+            if (!sel) return;
+            const depts = getDeptList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + depts.map(d =>
+                `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        function populateDesignationDropdown() {
+            const sel = document.getElementById('empFormDesig');
+            if (!sel) return;
+            const desigs = getDesignationList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + desigs.map(d =>
+                `<option value="${d}" ${d === current ? 'selected' : ''}>${d}</option>`).join('');
+        }
+
+        function populateGenderDropdown() {
+            const sel = document.getElementById('empFormGender');
+            if (!sel) return;
+            const genders = getGenderList();
+            const current = sel.value;
+            sel.innerHTML = '<option value="">Select</option>' + genders.map(g =>
+                `<option value="${g}" ${g === current ? 'selected' : ''}>${g}</option>`).join('');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  RENDER ALL
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function renderAll() {
+            renderDashboard();
+            renderEmployeeTable();
+            renderDirectory();
+            renderMyInfo();
+            renderConfigPage();
+            populateDropdowns();
+            updateNavBadges();
+            updateAdminVisibility();
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  MODAL HELPERS (kept for import & onboarding & view)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function openModal(id) { document.getElementById(id)?.classList.add('open'); }
+
+        function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
+
+        document.querySelectorAll('.modal-overlay').forEach(o => {
+            o.addEventListener('click', function(e) {
+                if (e.target === this) this.classList.remove('open');
+            });
+        });
+
+        // Override the onboarding modal open to populate it
+        const origOpenModal = openModal;
+        openModal = function(id) {
+            if (id === 'onboardingModal') {
+                openOnboardingModal();
+                return;
+            }
+            origOpenModal(id);
+        };
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  TOAST
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const icons = { success: 'fa-check-circle', error: 'fa-times-circle', warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle' };
+            const toast = document.createElement('div');
+            toast.className = `toast ${type !== 'success' ? type : ''}`;
+            toast.innerHTML = `<i class="fa ${icons[type] || icons.success}"></i> ${msg}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3200);
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  TABS (for My Info)
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function switchTab(group, tabKey) {
+            const bar = document.querySelector(`#page-${group} .tab-bar`);
+            if (bar) {
+                bar.querySelectorAll('.tab-item').forEach(t => {
+                    const onclick = t.getAttribute('onclick');
+                    t.classList.toggle('active', onclick && onclick.includes(`'${tabKey}'`));
+                });
+            }
+            document.querySelectorAll(`[id^="${group}Tab-"]`).forEach(c => {
+                c.classList.toggle('active', c.id === `${group}Tab-${tabKey}`);
+            });
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  DROPDOWN TOGGLE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('open');
+        }
+
+        function closeAllDropdowns() {
+            document.getElementById('userDropdown')?.classList.remove('open');
+        }
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#userDropdown') && !e.target.closest('#topbarAvatar')) {
+                document.getElementById('userDropdown')?.classList.remove('open');
+            }
+        });
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  MOBILE
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function toggleMobileSidebar() {
+            document.getElementById('sidebar').classList.toggle('mobile-open');
+            document.getElementById('sidebarOverlay').classList.toggle('open');
+        }
+
+        function closeMobileSidebar() {
+            document.getElementById('sidebar').classList.remove('mobile-open');
+            document.getElementById('sidebarOverlay').classList.remove('open');
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  GLOBAL SEARCH
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        function globalSearchFn(val) {
+            if (!val || val.length < 2) return;
+            const matches = employees.filter(e => e.name.toLowerCase().includes(val.toLowerCase()) || e.email.toLowerCase()
+                .includes(val.toLowerCase()) || e.dept.toLowerCase().includes(val.toLowerCase()));
+            if (matches.length) {
+                showToast(`Found ${matches.length} employee(s) matching "${val}"`, 'info');
+            }
+        }
+
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        //  INIT
+        // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('loginEmail').value = 'admin@xandersuite.com';
+            document.getElementById('loginPassword').value = 'password';
+            selectRole('admin');
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay.open').forEach(el => el.classList.remove('open'));
+                closeEmployeeDrawer();
+            }
+        });
+
+        // ── Expose functions globally ──
+        window.selectRole = selectRole;
+        window.doLogin = doLogin;
+        window.demoLogin = demoLogin;
+        window.doLogout = doLogout;
+        window.navigateTo = navigateTo;
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.toggleUserDropdown = toggleUserDropdown;
+        window.toggleMobileSidebar = toggleMobileSidebar;
+        window.closeMobileSidebar = closeMobileSidebar;
+        window.globalSearchFn = globalSearchFn;
+        window.switchTab = switchTab;
+        window.switchEmpTab = switchEmpTab;
+        window.showToast = showToast;
+        window.renderAll = renderAll;
+        window.renderEmployeeTable = renderEmployeeTable;
+        window.renderDashboard = renderDashboard;
+        window.renderDirectory = renderDirectory;
+        window.renderMyInfo = renderMyInfo;
+        window.renderConfigPage = renderConfigPage;
+        window.openEmployeeDrawer = openEmployeeDrawer;
+        window.closeEmployeeDrawer = closeEmployeeDrawer;
+        window.submitDrawerForm = submitDrawerForm;
+        window.editEmployee = editEmployee;
+        window.deleteEmployee = deleteEmployee;
+        window.viewEmployee = viewEmployee;
+        window.onboardCandidate = onboardCandidate;
+        window.removeOnboardingCandidate = removeOnboardingCandidate;
+        window.refreshOnboardingCandidates = refreshOnboardingCandidates;
+        window.selectImportOption = selectImportOption;
+        window.handleCsvImport = handleCsvImport;
+        window.syncFromUserManagement = syncFromUserManagement;
+        window.pullFromOnboarding = pullFromOnboarding;
+        window.addDepartment = addDepartment;
+        window.removeDepartment = removeDepartment;
+        window.addDesignation = addDesignation;
+        window.removeDesignation = removeDesignation;
+        window.addGender = addGender;
+        window.removeGender = removeGender;
+        window.saveConfig = saveConfig;
+
+        console.log('XanderSuite Employee Management Module loaded!');
+        console.log('Users: Admin (Arjun Verma), Manager (Pooja Nair), Employee (Riya Sharma)');
+        console.log('Features: Dashboard inside Employee module, Add Employee in sidebar and module header, right-side drawer for add/edit.');
+    </script>
+</body>
+</html>
